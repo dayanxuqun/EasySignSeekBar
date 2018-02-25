@@ -64,7 +64,7 @@ public class SignSeekBar extends View {
     @IntDef({NONE, SIDES, BOTTOM_SIDES, BELOW_SECTION_MARK})
     @Retention(RetentionPolicy.SOURCE)
     public @interface TextPosition {
-        int SIDES = 0, BOTTOM_SIDES = 1, BELOW_SECTION_MARK = 2;
+        int SIDES = 0, TOP_SIDES = 1, BOTTOM_SIDES = 2, BELOW_SECTION_MARK = 3;
     }
 
     private float mMin; // min
@@ -184,8 +184,10 @@ public class SignSeekBar extends View {
         if (pos == 0) {
             mSectionTextPosition = SIDES;
         } else if (pos == 1) {
-            mSectionTextPosition = TextPosition.BOTTOM_SIDES;
+            mSectionTextPosition = TextPosition.TOP_SIDES;
         } else if (pos == 2) {
+            mSectionTextPosition = TextPosition.BOTTOM_SIDES;
+        } else if (pos == 3) {
             mSectionTextPosition = TextPosition.BELOW_SECTION_MARK;
         } else {
             mSectionTextPosition = NONE;
@@ -342,7 +344,7 @@ public class SignSeekBar extends View {
             mPaint.getTextBounds("j", 0, 1, mRectText); // “j”是字母和阿拉伯数字中最高的
             height += mRectText.height() + mTextSpace; // 如果显示实时进度，则原来基础上加上进度文字高度和间隔
         }
-        if (isShowSectionText && mSectionTextPosition >= TextPosition.BOTTOM_SIDES) { // 如果Section值在track之下显示，比较取较大值
+        if (isShowSectionText && mSectionTextPosition >= TextPosition.TOP_SIDES) { // 如果Section值在track之下或之上显示，比较取较大值
             //测量节点文字的高度，如果有lable，测量真实的lable高度，如果没有表示显示的进度是数字，就用“j”代替测量高度
             String measuretext = isSidesLabels ? mSidesLabels[0] : "j";
             mPaint.setTextSize(mSectionTextSize);
@@ -350,8 +352,8 @@ public class SignSeekBar extends View {
             height = Math.max(height, mThumbRadiusOnDragging * 2 + mRectText.height() + mTextSpace);
         }
         if (isShowSign) {
+            height += mSignHeight;//加上提示框的高度
         }
-        height += mSignHeight;//加上提示框的高度
         if (isShowSignBorder) height += mSignBorderSize;//加上提示框边框高度
         setMeasuredDimension(resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec), height);
 
@@ -369,7 +371,7 @@ public class SignSeekBar extends View {
                 text = getMaxText();
                 mPaint.getTextBounds(text, 0, text.length(), mRectText);
                 mRight -= (mRectText.width() + mTextSpace);
-            } else if (mSectionTextPosition >= TextPosition.BOTTOM_SIDES) {
+            } else if (mSectionTextPosition >= TextPosition.TOP_SIDES) {
                 String text = isSidesLabels ? mSidesLabels[0] : getMinText();
                 mPaint.getTextBounds(text, 0, text.length(), mRectText);
                 float max = Math.max(mThumbRadiusOnDragging, mRectText.width() / 2f);
@@ -440,6 +442,20 @@ public class SignSeekBar extends View {
                 canvas.drawText(text, xRight - mRectText.width() / 2f, y_, mPaint);
                 xRight -= (mRectText.width() + mTextSpace);
 
+            } else if (mSectionTextPosition == TextPosition.TOP_SIDES) {
+                float y_ = yTop - mThumbRadiusOnDragging - mTextSpace;
+
+                // String text = getMinText();
+                String text = isSidesLabels ? mSidesLabels[0] : getMinText();
+                mPaint.getTextBounds(text, 0, text.length(), mRectText);
+                y_ -= mRectText.height();
+                xLeft = mLeft;
+                canvas.drawText(text, xLeft, y_, mPaint);
+                //text = getMaxText();
+                text = isSidesLabels && mSidesLabels.length > 1 ? mSidesLabels[mSidesLabels.length - 1] : getMaxText();
+                mPaint.getTextBounds(text, 0, text.length(), mRectText);
+                xRight = mRight;
+                canvas.drawText(text, xRight, y_, mPaint);
             } else if (mSectionTextPosition >= TextPosition.BOTTOM_SIDES) {
                 float y_ = yTop + mThumbRadiusOnDragging + mTextSpace;
 

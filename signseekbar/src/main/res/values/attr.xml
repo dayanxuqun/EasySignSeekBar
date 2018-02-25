@@ -23,8 +23,9 @@
         <!--text position of section-text relative to track, sides, bottom_sides, below_section_mark, default: sides-->
         <attr name="ssb_section_text_position">
             <enum name="sides" value="0"/>
-            <enum name="bottom_sides" value="1"/>
-            <enum name="below_section_mark" value="2"/>
+            <enum name="top_sides" value="1"/>
+            <enum name="bottom_sides" value="2"/>
+            <enum name="below_section_mark" value="3"/>
         </attr>
         <attr name="ssb_section_text_interval" format="integer"/> <!--the interval of two section-text, default: 1-->
         <attr name="ssb_show_thumb_text" format="boolean"/> <!--show real time progress-text under thumb or not, default: false-->
